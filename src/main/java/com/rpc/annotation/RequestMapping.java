@@ -1,5 +1,7 @@
 package com.rpc.annotation;
 
+import com.rpc.enums.RequestMethodEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -23,7 +25,7 @@ public @interface RequestMapping {
     /**
      * 方式
      */
-    String method() default "";
+    RequestMethodEnum method() default RequestMethodEnum.ALL;
 
 
 }

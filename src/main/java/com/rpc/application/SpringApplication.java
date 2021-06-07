@@ -1,13 +1,7 @@
 package com.rpc.application;
 
-import com.rpc.annotation.Autowire;
-import com.rpc.annotation.RestController;
-import com.rpc.annotation.Service;
-import com.rpc.test.Controller;
 
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
+import com.rpc.enums.RequestMethodEnum;
 
 /**
  * <p>
@@ -37,30 +31,25 @@ public class SpringApplication {
         //初始化反射框架
         reflectionUtils = new ReflectionUtils(main);
 
-        //初始化所有被标记的注解
-        initBean();
+        //初始化所有被标记的类
+        ApplicationContext.initBean();
+        //初始化路径
+        Handler.initMapping();
 
-        Controller controller = (Controller) BeanManager.getBean(Controller.class);
+        //执行适配器
+        HandlerAdapter.handle(null, "http://127.0.0.1:8080/test/get", RequestMethodEnum.GET.getValue());
     }
 
 
     /**
-     * 初始化所有被标记的注解
+     * 获取反射类工具
      *
+     * @return 反射类工具
      * @author zhq
-     * @since 2021/6/6 7:56 下午
+     * @since 2021/6/7 12:20 下午
      */
-    private static void initBean() {
-        Set<Class<?>> signClass = new HashSet<>();
-        //获取标记restController的类
-        Set<Class<?>> signRestControllerClass = reflectionUtils.getClassByAnnotation(RestController.class);
-        //获取标记service的类
-        Set<Class<?>> signServiceClass = reflectionUtils.getClassByAnnotation(Service.class);
-
-        signClass.addAll(signRestControllerClass);
-        signClass.addAll(signServiceClass);
-
-        //将所有类注册进去bean管理器
-        BeanManager.putBeanList(signClass);
+    public static ReflectionUtils getReflectionUtils() {
+        return reflectionUtils;
     }
+
 }

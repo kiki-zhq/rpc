@@ -14,12 +14,13 @@ import com.rpc.test.service.ServiceImpl;
  * @date 2021/6/6
  */
 @RestController
-@RequestMapping("test")
+@RequestMapping("/test")
 public class Controller {
 
     @Autowire
     private ServiceImpl service;
 
+    @RequestMapping("/get")
     public void say() {
         System.out.println("hello");
     }

@@ -1,6 +1,8 @@
 package com.rpc.application;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -17,13 +19,14 @@ import java.util.Set;
  */
 public class ReflectionUtils {
 
-    private Class<?> type;
+    /**
+     * 主入口
+     */
+    private final Class<?> type;
 
-    private Reflections reflections;
 
     public ReflectionUtils(Class<?> type) {
         this.type = type;
-        this.reflections = new Reflections(type.getPackage());
     }
 
     /**
@@ -35,6 +38,7 @@ public class ReflectionUtils {
      * @since 2021/6/6 7:47 下午
      */
     public Set<Class<?>> getClassByAnnotation(Class<? extends Annotation> annotation) {
+        Reflections reflections = new Reflections(type.getPackage());
         return reflections.getTypesAnnotatedWith(annotation);
     }
 
@@ -47,6 +51,7 @@ public class ReflectionUtils {
      * @since 2021/6/7 10:40 上午
      */
     public Set<Method> getMethodByAnnotation(Class<? extends Annotation> annotation) {
+        Reflections reflections = new Reflections(type.getPackage(), new MethodAnnotationsScanner());
         return reflections.getMethodsAnnotatedWith(annotation);
     }
 
@@ -59,6 +64,7 @@ public class ReflectionUtils {
      * @since 2021/6/7 10:59 上午
      */
     public Set<Field> getFieldByAnnotation(Class<? extends Annotation> annotation) {
+        Reflections reflections = new Reflections(type.getPackage(), new FieldAnnotationsScanner());
         return reflections.getFieldsAnnotatedWith(annotation);
     }
 }

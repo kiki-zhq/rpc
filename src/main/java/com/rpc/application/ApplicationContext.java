@@ -1,7 +1,10 @@
 package com.rpc.application;
 
 import com.rpc.annotation.Autowire;
+import com.rpc.annotation.RestController;
+import com.rpc.annotation.Service;
 
+import javax.swing.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +17,7 @@ import java.util.stream.Collectors;
  * @author kiki
  * @date 2021/6/6
  */
-public class BeanManager {
+public class ApplicationContext {
 
     /**
      * 注册beanMap
@@ -95,4 +98,23 @@ public class BeanManager {
         }
     }
 
+    /**
+     * 初始化所有被标记的注解
+     *
+     * @author zhq
+     * @since 2021/6/6 7:56 下午
+     */
+    public static void initBean() {
+        Set<Class<?>> signClass = new HashSet<>();
+        //获取标记restController的类
+        Set<Class<?>> signRestControllerClass = SpringApplication.getReflectionUtils().getClassByAnnotation(RestController.class);
+        //获取标记service的类
+        Set<Class<?>> signServiceClass = SpringApplication.getReflectionUtils().getClassByAnnotation(Service.class);
+
+        signClass.addAll(signRestControllerClass);
+        signClass.addAll(signServiceClass);
+
+        //将所有类注册进去bean管理器
+        putBeanList(signClass);
+    }
 }
