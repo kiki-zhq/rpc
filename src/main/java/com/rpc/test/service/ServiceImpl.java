@@ -12,4 +12,8 @@ import com.rpc.annotation.Service;
  */
 @Service
 public class ServiceImpl {
+
+    public void say() {
+        System.out.println("hello world");
+    }
 }

@@ -1,6 +1,7 @@
-package com.rpc.application;
+package com.rpc.application.mvc;
 
 import com.rpc.annotation.RequestMapping;
+import com.rpc.application.SpringApplication;
 import com.rpc.enums.RequestMethodEnum;
 
 import java.lang.reflect.Method;
@@ -30,10 +31,6 @@ public class Handler {
      * 路径请求方式管理map key->方式  value-> 路径列表
      */
     private static Map<RequestMethodEnum, Set<String>> requestMethodEnumMap = new HashMap<>();
-
-    public static void main(String[] args) {
-        System.out.println(requestMethodEnumMap.get(null));
-    }
 
     /**
      * 生成类路径管理

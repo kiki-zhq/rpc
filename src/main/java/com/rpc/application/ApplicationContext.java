@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- * Bean管理器
+ * Bean管理器  TODO 需要解决循环依赖问题
  * </p>
  *
  * @author kiki

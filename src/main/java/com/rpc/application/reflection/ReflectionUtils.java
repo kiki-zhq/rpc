@@ -1,4 +1,4 @@
-package com.rpc.application;
+package com.rpc.application.reflection;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;

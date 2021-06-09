@@ -1,7 +1,11 @@
 package com.rpc.application;
 
 
-import com.rpc.enums.RequestMethodEnum;
+import com.rpc.application.mvc.Handler;
+import com.rpc.application.netty.Server;
+import com.rpc.application.reflection.ReflectionUtils;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 /**
  * <p>
@@ -12,6 +16,12 @@ import com.rpc.enums.RequestMethodEnum;
  * @date 2021/6/6
  */
 public class SpringApplication {
+
+
+    /**
+     * 加载日志
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(SpringApplication.class);
 
     /**
      * 反射框架
@@ -33,11 +43,15 @@ public class SpringApplication {
 
         //初始化所有被标记的类
         ApplicationContext.initBean();
+        System.out.println("初始化所有被标记的类成功");
+        LOG.debug("初始化所有被标记的类成功");
         //初始化路径
         Handler.initMapping();
+        System.out.println("初始化路径成功");
+        LOG.debug("初始化路径成功");
 
-        //执行适配器
-        HandlerAdapter.handle(null, "http://127.0.0.1:8080/test/get", RequestMethodEnum.GET.getValue());
+        //服务开启
+        Server.run();
     }
 
 

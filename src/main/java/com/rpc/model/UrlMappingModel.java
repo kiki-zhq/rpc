@@ -24,4 +24,14 @@ public class UrlMappingModel {
      * 方法名称
      */
     private String methodName;
+
+    /**
+     * 方法参数
+     */
+    private Class<?>[] methodArgsType;
+
+    /**
+     * 方法返回类型
+     */
+    private Class<?> methodReturnType;
 }

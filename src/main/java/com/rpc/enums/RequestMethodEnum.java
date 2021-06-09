@@ -65,4 +65,15 @@ public enum RequestMethodEnum {
                 .filter(a -> method.equals(a.getValue())).findFirst();
         return methodEnum.orElse(RequestMethodEnum.ALL);
     }
+
+    /**
+     * 判断是否参数
+     *
+     * @param method 请求
+     * @author kiki
+     * @since 2021/6/9 11:12 上午
+     */
+    public static boolean isQuery(RequestMethodEnum method) {
+        return method == RequestMethodEnum.GET || method == RequestMethodEnum.DELETE;
+    }
 }
