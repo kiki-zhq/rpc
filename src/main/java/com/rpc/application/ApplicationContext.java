@@ -39,17 +39,15 @@ public class ApplicationContext {
      */
     public static void putBeanList(Set<Class<?>> signClass) {
         for (Class<?> sign : signClass) {
-            if (beanInitMap.containsKey(sign.getName())) {
-                continue;
-            }
             try {
                 Object bean = beanInitMap.getOrDefault(sign.getName(), sign.newInstance());
+                beanInitMap.put(sign.getName(), bean);
                 //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
                 List<Field> fieldList = getAnnotationFieldList(sign);
                 //设置属性的依赖
                 setFieldBean(fieldList, bean, new HashSet<>());
 
-                beanInitMap.put(sign.getName(), bean);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -77,6 +75,9 @@ public class ApplicationContext {
      * @since 2021/6/7 11:09 上午
      */
     private static void setFieldBean(List<Field> fields, Object bean, Set<String> beanName) throws InstantiationException, IllegalAccessException, BeanErrorException {
+        if (beanInstanceMap.containsKey(bean.getClass().getName())) {
+            return;
+        }
         for (Field field : fields) {
             if (beanName.contains(field.getType().getName())) {
                 throw new BeanErrorException("bean之间循环依赖了");
