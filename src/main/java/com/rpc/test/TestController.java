@@ -4,6 +4,7 @@ import com.rpc.annotation.Autowire;
 import com.rpc.annotation.RequestMapping;
 import com.rpc.annotation.RestController;
 import com.rpc.test.service.ServiceImpl;
+import com.rpc.test.service.TestServiceImpl;
 
 /**
  * <p>
@@ -18,10 +19,11 @@ import com.rpc.test.service.ServiceImpl;
 public class TestController {
 
     @Autowire
-    private ServiceImpl service;
+    private TestServiceImpl service;
 
     @RequestMapping("/test")
     public void test() {
-        service.say();
+        System.out.println("hello");
+        service.test();
     }
 }

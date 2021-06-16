@@ -44,11 +44,9 @@ public class SpringApplication {
         //初始化所有被标记的类
         ApplicationContext.initBean();
         System.out.println("初始化所有被标记的类成功");
-        LOG.debug("初始化所有被标记的类成功");
         //初始化路径
         Handler.initMapping();
         System.out.println("初始化路径成功");
-        LOG.debug("初始化路径成功");
 
         //服务开启
         Server.run();

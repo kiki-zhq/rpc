@@ -3,6 +3,8 @@ package com.rpc.application;
 import com.rpc.annotation.Autowire;
 import com.rpc.annotation.RestController;
 import com.rpc.annotation.Service;
+import com.rpc.exception.BeanErrorException;
+import com.rpc.utils.CheckUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -19,10 +21,14 @@ import java.util.stream.Collectors;
 public class ApplicationContext {
 
     /**
-     * 注册beanMap
+     * 注册beanMap key-> name value->实例
      */
-    private static Map<String, Object> beanMap = new HashMap<>();
+    private static Map<String, Object> beanInitMap = new HashMap<>();
 
+    /**
+     * 注册beanFactory key-> name  value->map
+     */
+    private static Map<String, Object> beanInstanceMap = new HashMap<>();
 
     /**
      * 注册Bean列表
@@ -33,15 +39,17 @@ public class ApplicationContext {
      */
     public static void putBeanList(Set<Class<?>> signClass) {
         for (Class<?> sign : signClass) {
+            if (beanInitMap.containsKey(sign.getName())) {
+                continue;
+            }
             try {
-                Object bean = beanMap.getOrDefault(sign.getName(), sign.newInstance());
+                Object bean = beanInitMap.getOrDefault(sign.getName(), sign.newInstance());
                 //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
-                List<Field> fieldList = Arrays.stream(sign.getDeclaredFields())
-                        .filter(a -> a.getAnnotationsByType(Autowire.class).length > 0).collect(Collectors.toList());
+                List<Field> fieldList = getAnnotationFieldList(sign);
                 //设置属性的依赖
-                setFieldBean(fieldList, bean);
+                setFieldBean(fieldList, bean, new HashSet<>());
 
-                beanMap.put(sign.getName(), bean);
+                beanInitMap.put(sign.getName(), bean);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -57,44 +65,59 @@ public class ApplicationContext {
      * @since 2021/6/6 8:19 下午
      */
     public static Object getBean(Class<?> signClass) {
-        return beanMap.get(signClass.getName());
+        return beanInstanceMap.get(signClass.getName());
     }
 
     /**
-     * 设置属性的依赖
+     * 设置属性的依赖 需要递归进行解决循环依赖的问题
      *
      * @param fields 属性值列表
      * @param bean   bean
      * @author zhq
      * @since 2021/6/7 11:09 上午
      */
-    private static void setFieldBean(List<Field> fields, Object bean) throws InstantiationException, IllegalAccessException {
+    private static void setFieldBean(List<Field> fields, Object bean, Set<String> beanName) throws InstantiationException, IllegalAccessException, BeanErrorException {
         for (Field field : fields) {
-            field.setAccessible(true);
-            if (beanMap.get(field.getType().getName()) == null) {
-                beanMap.put(field.getType().getName(), field.getType().newInstance());
+            if (beanName.contains(field.getType().getName())) {
+                throw new BeanErrorException("bean之间循环依赖了");
             }
-            Object fieldBean = beanMap.get(field.getType().getName());
-            field.set(bean, fieldBean);
+            field.setAccessible(true);
+            beanName.add(field.getType().getName());
+            //子属性bean初始化
+            Object subBeanInit;
+            if (beanInitMap.get(field.getType().getName()) == null) {
+                subBeanInit = field.getType().newInstance();
+                beanInitMap.put(field.getType().getName(), subBeanInit);
+            } else {
+                subBeanInit = beanInitMap.get(field.getType().getName());
+            }
+            //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
+            List<Field> subfields = getAnnotationFieldList(field.getType());
+            if (CheckUtils.isListEmpty(subfields)) {
+                //设置bean的属性
+                beanInstanceMap.put(bean.getClass().getName(), bean);
+            }
+            //递归操作
+            setFieldBean(subfields, subBeanInit, beanName);
+            //设置子属性
+            field.set(bean, subBeanInit);
+            //设置主bean的属性
+            beanInstanceMap.put(bean.getClass().getName(), bean);
         }
     }
 
     /**
-     * 注册注解列表
+     * 获取被标记的属性
      *
-     * @param signAutoWireField 标记autowire属性
-     * @author zhq
-     * @since 2021/6/7 11:07 上午
+     * @param sign 类
+     * @return 被标记的属性
+     * @author kiki
+     * @since 2021/6/16 5:44 下午
      */
-    public static void putSignAutoWireList(Set<Field> signAutoWireField) {
-        for (Field field : signAutoWireField) {
-            try {
-                beanMap.put(field.getType().getName(), field.getType().newInstance());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
+    private static List<Field> getAnnotationFieldList(Class<?> sign) {
+        //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
+        return Arrays.stream(sign.getDeclaredFields())
+                .filter(a -> a.getAnnotationsByType(Autowire.class).length > 0).collect(Collectors.toList());
     }
 
     /**

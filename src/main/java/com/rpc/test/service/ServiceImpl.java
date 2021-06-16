@@ -1,6 +1,8 @@
 package com.rpc.test.service;
 
+import com.rpc.annotation.Autowire;
 import com.rpc.annotation.Service;
+import com.rpc.test.TestController;
 
 /**
  * <p>
@@ -13,7 +15,11 @@ import com.rpc.annotation.Service;
 @Service
 public class ServiceImpl {
 
+    @Autowire
+    private TestServiceImpl testService;
+
     public void say() {
         System.out.println("hello world");
+        testService.test();
     }
 }
