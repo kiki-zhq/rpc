@@ -3,12 +3,28 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="rpc-producer" />
+        <module name="rpc-consumer" />
+        <module name="rpc-netty" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="rpc" target="8" />
+      <module name="rpc-consumer" target="8" />
+      <module name="rpc-netty" target="8" />
+      <module name="rpc-producer" target="8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="rpc" options="" />
+      <module name="rpc-consumer" options="" />
+      <module name="rpc-netty" options="" />
+    </option>
   </component>
 </project>

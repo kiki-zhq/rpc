@@ -2,7 +2,6 @@ package com.rpc.test.service;
 
 import com.rpc.annotation.Autowire;
 import com.rpc.annotation.Service;
-import com.rpc.test.TestController;
 
 /**
  * <p>

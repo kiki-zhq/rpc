@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/rpc.iml" filepath="$PROJECT_DIR$/.idea/rpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpc-consumer/rpc-consumer.iml" filepath="$PROJECT_DIR$/rpc-consumer/rpc-consumer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpc-netty/rpc-netty.iml" filepath="$PROJECT_DIR$/rpc-netty/rpc-netty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpc-producer/rpc-producer.iml" filepath="$PROJECT_DIR$/rpc-producer/rpc-producer.iml" />
     </modules>
   </component>
 </project>

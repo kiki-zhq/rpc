@@ -1,9 +1,9 @@
 package com.rpc.application.mvc;
 
 import com.alibaba.fastjson.JSONObject;
+import com.rpc.enums.RequestMethodEnum;
 import com.rpc.annotation.RequestParam;
 import com.rpc.application.ApplicationContext;
-import com.rpc.enums.RequestMethodEnum;
 import com.rpc.model.UrlMappingModel;
 import com.rpc.utils.CheckUtils;
 

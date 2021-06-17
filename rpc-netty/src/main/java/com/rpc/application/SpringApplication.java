@@ -10,7 +10,6 @@ import com.sun.org.slf4j.internal.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * <p>

@@ -1,7 +1,7 @@
 package com.rpc.application.netty;
 
-import com.rpc.application.netty.channel.HttpChannelInitializerImpl;
 import com.rpc.application.netty.channel.RpcServerChannelInitializerImpl;
+import com.rpc.application.netty.channel.HttpChannelInitializerImpl;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

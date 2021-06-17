@@ -2,8 +2,9 @@ package com.rpc.application;
 
 import com.rpc.annotation.*;
 import com.rpc.application.proxy.ProxyInvocationHandler;
-import com.rpc.exception.BeanErrorException;
 import com.rpc.utils.CheckUtils;
+import rpc.annotation.*;
+import com.rpc.exception.BeanErrorException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -166,9 +167,9 @@ public class ApplicationContext {
     public static void initBean() {
         Set<Class<?>> signClass = new HashSet<>();
         //获取标记RestController的类
-        Set<Class<?>> signRestControllerClass = SpringApplication.getReflectionUtils().getClassByAnnotation(RestController.class);
+        Set<Class<?>> signRestControllerClass = com.rpc.application.SpringApplication.getReflectionUtils().getClassByAnnotation(RestController.class);
         //获取标记Service的类
-        Set<Class<?>> signServiceClass = SpringApplication.getReflectionUtils().getClassByAnnotation(Service.class);
+        Set<Class<?>> signServiceClass = com.rpc.application.SpringApplication.getReflectionUtils().getClassByAnnotation(Service.class);
         //获取标记RpcService的类
         Set<Class<?>> signRpcServiceClass = SpringApplication.getReflectionUtils().getClassByAnnotation(RpcService.class);
 
