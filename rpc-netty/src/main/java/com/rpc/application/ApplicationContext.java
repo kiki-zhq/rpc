@@ -3,7 +3,6 @@ package com.rpc.application;
 import com.rpc.annotation.*;
 import com.rpc.application.proxy.ProxyInvocationHandler;
 import com.rpc.utils.CheckUtils;
-import rpc.annotation.*;
 import com.rpc.exception.BeanErrorException;
 
 import java.lang.reflect.Field;

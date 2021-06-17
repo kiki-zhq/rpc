@@ -8,12 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="rpc-producer" />
+        <module name="rpc-common" />
         <module name="rpc-consumer" />
         <module name="rpc-netty" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="rpc" target="8" />
+      <module name="rpc-common" target="8" />
       <module name="rpc-consumer" target="8" />
       <module name="rpc-netty" target="8" />
       <module name="rpc-producer" target="8" />
@@ -25,6 +27,7 @@
       <module name="rpc" options="" />
       <module name="rpc-consumer" options="" />
       <module name="rpc-netty" options="" />
+      <module name="rpc-producer" options="" />
     </option>
   </component>
 </project>

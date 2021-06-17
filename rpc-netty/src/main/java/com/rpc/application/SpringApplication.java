@@ -83,9 +83,9 @@ public class SpringApplication {
      * @author kiki
      * @since 2021/6/17 3:51 下午
      */
-    public static void run(Class<?> main, String[] args, String host, int targetPort) {
-        //初始化标记以及路径
-        init(main, args);
+    public static void run(Class<?> main, String[] args, int port, String host, int targetPort) {
+        //服务端初始化
+        run(main, args, port);
         new Client(host, targetPort).run();
         System.out.println(Client.channel);
     }

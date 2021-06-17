@@ -24,6 +24,7 @@
         <module>rpc-netty</module>
         <module>rpc-consumer</module>
         <module>rpc-producer</module>
+        <module>rpc-common</module>
     </modules>
 
     <dependencies>
