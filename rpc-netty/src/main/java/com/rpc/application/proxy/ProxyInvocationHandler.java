@@ -1,9 +1,11 @@
 package com.rpc.application.proxy;
 
-import com.rpc.application.netty.Client;
+import com.rpc.application.SpringApplication;
+import com.rpc.application.netty.RpcClient;
 import com.rpc.application.netty.handle.RpcClientHandle;
 import com.rpc.application.netty.model.RpcRequest;
 import com.rpc.application.netty.model.RpcResponse;
+import com.rpc.utils.SerializationUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -31,9 +33,11 @@ public class ProxyInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //生成模型
-        RpcRequest request = generateRpcRequest(proxy, method, args);
-        //进行发送请求
-        Client.channel.writeAndFlush(request);
+        RpcRequest request = generateRpcRequest(method, args);
+
+        //发送请求
+        SpringApplication.THREAD_POOL.submit(new RpcClient(SpringApplication.targetHost, SpringApplication.targetPort, request));
+
         RpcResponse response;
         //获取响应结果
         int count = 0;
@@ -48,7 +52,7 @@ public class ProxyInvocationHandler implements InvocationHandler {
             count++;
             Thread.sleep(1000);
         }
-        return response.getReturnValue();
+        return SerializationUtils.parse(response.getReturnValue(), method.getReturnType());
     }
 
 
@@ -62,10 +66,10 @@ public class ProxyInvocationHandler implements InvocationHandler {
      * @author kiki
      * @since 2021/6/17 6:38 下午
      */
-    private RpcRequest generateRpcRequest(Object proxy, Method method, Object[] args) {
+    private RpcRequest generateRpcRequest(Method method, Object[] args) {
         RpcRequest request = new RpcRequest();
         request.setUnionId(Thread.currentThread().getName() + Thread.currentThread().getId());
-        request.setClassName(proxy.getClass());
+        request.setClassName(method.getDeclaringClass());
         request.setMethodName(method.getName());
         request.setParameterType(method.getParameterTypes());
         request.setParameterValue(args);

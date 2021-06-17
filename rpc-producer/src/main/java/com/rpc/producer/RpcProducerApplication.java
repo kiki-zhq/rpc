@@ -15,9 +15,14 @@ public class RpcProducerApplication {
     /**
      * 端口号
      */
-    private static final int PORT = 8081;
+    private static final int PORT = 8082;
+
+    /**
+     * rpc端口
+     */
+    private static final int rpcPort = 8081;
 
     public static void main(String[] args) {
-        SpringApplication.run(RpcProducerApplication.class, args, PORT);
+        SpringApplication.run(RpcProducerApplication.class, args, PORT, rpcPort);
     }
 }

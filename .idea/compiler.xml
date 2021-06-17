@@ -25,6 +25,7 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="rpc" options="" />
+      <module name="rpc-common" options="-parameters" />
       <module name="rpc-consumer" options="" />
       <module name="rpc-netty" options="" />
       <module name="rpc-producer" options="" />

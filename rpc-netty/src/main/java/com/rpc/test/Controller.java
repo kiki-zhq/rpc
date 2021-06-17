@@ -16,7 +16,7 @@ import com.rpc.test.service.TestServiceImpl;
  * @date 2021/6/6
  */
 @RestController
-@RequestMapping("/test")
+//@RequestMapping("/test")
 public class Controller {
 
     @Autowire
@@ -25,7 +25,7 @@ public class Controller {
     @Autowire
     private TestServiceImpl testService;
 
-    @RequestMapping("/get")
+//    @RequestMapping("/get")
     public void say(@RequestParam("title") String title, String content) {
         System.out.println("title:" + title + "content:" + content);
         service.say();

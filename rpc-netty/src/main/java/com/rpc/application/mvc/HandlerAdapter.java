@@ -130,7 +130,7 @@ public class HandlerAdapter {
                 List<String> list = Arrays.stream(query.split("&")).collect(Collectors.toList());
                 for (String keyValue : list) {
                     String[] string = keyValue.split("=");
-                    body.put(string[0], string[1]);
+                    body.put(string[0], string[1].matches("[0-9]+")? Integer.valueOf(string[1]): string[1]);
                 }
             }
         } else {

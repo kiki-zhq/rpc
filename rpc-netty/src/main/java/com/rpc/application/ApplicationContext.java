@@ -49,6 +49,9 @@ public class ApplicationContext {
                 beanInitMap.put(sign.getName(), bean);
                 //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
                 List<Field> fieldList = getAnnotationFieldList(sign);
+                if (CheckUtils.isListEmpty(fieldList)){
+                    beanInstanceMap.put(sign.getName(), bean);
+                }
                 //设置属性的依赖
                 setFieldBean(fieldList, bean, new HashSet<>());
             } catch (Exception e) {
@@ -67,7 +70,7 @@ public class ApplicationContext {
      */
     public static Object getBean(Class<?> signClass, boolean isInterface) {
         if (isInterface) {
-            beanInstanceMap.get(rpcMap.get(signClass.getName()));
+            return beanInstanceMap.get(rpcMap.get(signClass.getName()));
         }
         return beanInstanceMap.get(signClass.getName());
     }
@@ -146,7 +149,7 @@ public class ApplicationContext {
             //是否被rpc关联注解标记 是则进行另外创建
             if (field.isAnnotationPresent(RpcReference.class)) {
                 //进行动态代理生成接口代理对象
-                subBeanInit = Proxy.newProxyInstance(field.getClass().getClassLoader(), new Class[]{field.getClass()}, new ProxyInvocationHandler());
+                subBeanInit = Proxy.newProxyInstance(field.getType().getClassLoader(), new Class[]{field.getType()}, new ProxyInvocationHandler());
             } else {
                 subBeanInit = field.getType().newInstance();
             }

@@ -34,6 +34,7 @@ public class RpcHandlerAdapter {
             e.printStackTrace();
             response.setCode(RpcCodeEnums.ERROR.getValue());
         }
+        response.setUnionId(request.getUnionId());
         return response;
     }
 

@@ -1,20 +1,24 @@
 package com.rpc.application.netty;
 
 import com.rpc.application.netty.channel.HttpChannelInitializerImpl;
+import com.rpc.application.netty.channel.RpcServerChannelInitializerImpl;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
  * <p>
- * 服务端
+ *
  * </p>
  *
  * @author kiki
- * @date 2021/6/8
+ * @date 2021/6/17
  */
-public class Server implements Runnable {
+public class RpcServer implements Runnable {
+
 
     /**
      * 端口号
@@ -22,7 +26,7 @@ public class Server implements Runnable {
     private int port;
 
 
-    public Server(int port) {
+    public RpcServer(int port) {
         this.port = port;
     }
 
@@ -52,8 +56,8 @@ public class Server implements Runnable {
                     .channel(NioServerSocketChannel.class)
                     //设置配置  tcp握手时最大的消息队列大小
                     .option(ChannelOption.SO_BACKLOG, 1024)
-                    //初始化请求通道的处理流程
-                    .childHandler(new HttpChannelInitializerImpl());
+                    //初始化rpc请求通道的处理过程
+                    .childHandler(new RpcServerChannelInitializerImpl());
             //sync方法是等待异步操作执行完毕
             System.out.println("初始化成功，开启服务中");
             ChannelFuture cf = bootstrap.bind(port).sync();
@@ -69,5 +73,4 @@ public class Server implements Runnable {
             handleGroup.shutdownGracefully();
         }
     }
-
 }

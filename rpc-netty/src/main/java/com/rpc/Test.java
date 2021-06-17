@@ -20,7 +20,7 @@ public class Test {
     private static final String HOST = "127.0.0.1";
 
     public static void main(String[] args) {
-        SpringApplication.run(Test.class, args, PORT);
+        SpringApplication.run(Test.class, args, PORT, PORT);
     }
 
 }

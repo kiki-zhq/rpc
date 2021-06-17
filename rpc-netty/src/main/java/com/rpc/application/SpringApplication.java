@@ -2,7 +2,7 @@ package com.rpc.application;
 
 
 import com.rpc.application.mvc.Handler;
-import com.rpc.application.netty.Client;
+import com.rpc.application.netty.RpcServer;
 import com.rpc.application.netty.Server;
 import com.rpc.application.reflection.ReflectionUtils;
 import com.sun.org.slf4j.internal.Logger;
@@ -35,7 +35,17 @@ public class SpringApplication {
     /**
      * 线程池
      */
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(2);
+    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(2);
+
+    /**
+     * 目标地址
+     */
+    public static String targetHost;
+
+    /**
+     * 目标端口
+     */
+    public static int targetPort;
 
     /**
      * 初始化标记以及路径
@@ -60,17 +70,21 @@ public class SpringApplication {
     /**
      * 服务端初始化
      *
-     * @param main 主入口类
-     * @param args 参数
-     * @param port 端口
+     * @param main    主入口类
+     * @param args    参数
+     * @param port    端口
+     * @param rpcPort rpc端口
      * @author zhq
      * @since 2021/6/6 7:54 下午
      */
-    public static void run(Class<?> main, String[] args, int port) {
+    public static void run(Class<?> main, String[] args, int port, int rpcPort) {
         //初始化标记以及路径
         init(main, args);
         //服务开启
         THREAD_POOL.submit(new Server(port));
+        if (SpringApplication.targetHost == null) {
+            THREAD_POOL.submit(new RpcServer(rpcPort));
+        }
     }
 
     /**
@@ -84,10 +98,10 @@ public class SpringApplication {
      * @since 2021/6/17 3:51 下午
      */
     public static void run(Class<?> main, String[] args, int port, String host, int targetPort) {
+        SpringApplication.targetHost = host;
+        SpringApplication.targetPort = targetPort;
         //服务端初始化
-        run(main, args, port);
-        new Client(host, targetPort).run();
-        System.out.println(Client.channel);
+        run(main, args, port, port);
     }
 
     /**
