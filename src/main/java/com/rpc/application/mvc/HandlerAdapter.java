@@ -103,7 +103,7 @@ public class HandlerAdapter {
      */
     private static Object invokeMethod(String query, String content, UrlMappingModel model, boolean isQuery) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         //获取目标类的bean
-        Object targetInstance = ApplicationContext.getBean(model.getTargetClass());
+        Object targetInstance = ApplicationContext.getBean(model.getTargetClass(), false);
         //获取目标方法
         Method targetMethod = model.getTargetClass().getMethod(model.getMethodName(), model.getMethodArgsType());
         //获取方法的参数

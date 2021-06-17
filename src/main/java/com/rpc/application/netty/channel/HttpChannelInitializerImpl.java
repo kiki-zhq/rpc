@@ -1,5 +1,6 @@
-package com.rpc.application.netty;
+package com.rpc.application.netty.channel;
 
+import com.rpc.application.netty.handle.HttpServerHandle;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -15,7 +16,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * @author kiki
  * @date 2021/6/8
  */
-public class ChannelInitializerImpl extends ChannelInitializer<SocketChannel> {
+public class HttpChannelInitializerImpl extends ChannelInitializer<SocketChannel> {
 
     /**
      * 初始化通道
@@ -31,6 +32,6 @@ public class ChannelInitializerImpl extends ChannelInitializer<SocketChannel> {
         ch.pipeline().addLast(new HttpObjectAggregator(65535));
         ch.pipeline().addLast(new HttpResponseEncoder());
         ch.pipeline().addLast(new ChunkedWriteHandler());
-        ch.pipeline().addLast(new ServerHandle());
+        ch.pipeline().addLast(new HttpServerHandle());
     }
 }

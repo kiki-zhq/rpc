@@ -1,12 +1,12 @@
 package com.rpc.application;
 
-import com.rpc.annotation.Autowire;
-import com.rpc.annotation.RestController;
-import com.rpc.annotation.Service;
+import com.rpc.annotation.*;
+import com.rpc.application.proxy.ProxyInvocationHandler;
 import com.rpc.exception.BeanErrorException;
 import com.rpc.utils.CheckUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,11 @@ public class ApplicationContext {
     private static Map<String, Object> beanInstanceMap = new HashMap<>();
 
     /**
+     * 获取接口的实现类 key-> 接口名 value-> 实现类
+     */
+    private static Map<String, String> rpcMap = new HashMap<>();
+
+    /**
      * 注册Bean列表
      *
      * @param signClass 标记类列表
@@ -46,8 +51,6 @@ public class ApplicationContext {
                 List<Field> fieldList = getAnnotationFieldList(sign);
                 //设置属性的依赖
                 setFieldBean(fieldList, bean, new HashSet<>());
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -62,7 +65,10 @@ public class ApplicationContext {
      * @author zhq
      * @since 2021/6/6 8:19 下午
      */
-    public static Object getBean(Class<?> signClass) {
+    public static Object getBean(Class<?> signClass, boolean isInterface) {
+        if (isInterface) {
+            beanInstanceMap.get(rpcMap.get(signClass.getName()));
+        }
         return beanInstanceMap.get(signClass.getName());
     }
 
@@ -80,35 +86,39 @@ public class ApplicationContext {
         }
         for (Field field : fields) {
             if (beanName.contains(field.getType().getName())) {
-                throw new BeanErrorException("bean之间循环依赖了");
+                throw new BeanErrorException("bean之间循环依赖了 循环依赖对象:" + field.getType().getName());
             }
             field.setAccessible(true);
             beanName.add(field.getType().getName());
             //子属性bean初始化
-            Object subBeanInit;
-            if (beanInitMap.get(field.getType().getName()) == null) {
-                subBeanInit = field.getType().newInstance();
-                beanInitMap.put(field.getType().getName(), subBeanInit);
-            } else {
-                subBeanInit = beanInitMap.get(field.getType().getName());
-            }
+            Object subBeanInit = initSubBeanInstance(field);
+
             //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
             List<Field> subfields = getAnnotationFieldList(field.getType());
             if (CheckUtils.isListEmpty(subfields)) {
-                //设置bean的属性
-                beanInstanceMap.put(bean.getClass().getName(), bean);
+                if (!beanInstanceMap.containsKey(subBeanInit.getClass().getName())) {
+                    //设置bean的属性
+                    beanInstanceMap.put(subBeanInit.getClass().getName(), subBeanInit);
+                }
+                //设置子属性
+                field.set(bean, beanInstanceMap.get(subBeanInit.getClass().getName()));
+                beanName.remove(subBeanInit.getClass().getName());
+                beanName.remove(bean.getClass().getName());
+                return;
             }
             //递归操作
             setFieldBean(subfields, subBeanInit, beanName);
             //设置子属性
             field.set(bean, subBeanInit);
             //设置主bean的属性
+            beanInstanceMap.put(subBeanInit.getClass().getName(), bean);
             beanInstanceMap.put(bean.getClass().getName(), bean);
+            beanName.remove(bean.getClass().getName());
         }
     }
 
     /**
-     * 获取被标记的属性
+     * 获取自动注入被标记的属性
      *
      * @param sign 类
      * @return 被标记的属性
@@ -118,7 +128,33 @@ public class ApplicationContext {
     private static List<Field> getAnnotationFieldList(Class<?> sign) {
         //获取被标记的autowire注解的属性值 获取DeclareField防止值私有化
         return Arrays.stream(sign.getDeclaredFields())
-                .filter(a -> a.getAnnotationsByType(Autowire.class).length > 0).collect(Collectors.toList());
+                .filter(a -> a.getAnnotationsByType(Autowire.class).length > 0 || a.getAnnotationsByType(RpcReference.class).length > 0)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 初始化bean的实例
+     *
+     * @param field 属性
+     * @return 实例
+     * @author kiki
+     * @since 2021/6/17 6:20 下午
+     */
+    private static Object initSubBeanInstance(Field field) throws InstantiationException, IllegalAccessException {
+        Object subBeanInit;
+        if (beanInitMap.get(field.getType().getName()) == null) {
+            //是否被rpc关联注解标记 是则进行另外创建
+            if (field.isAnnotationPresent(RpcReference.class)) {
+                //进行动态代理生成接口代理对象
+                subBeanInit = Proxy.newProxyInstance(field.getClass().getClassLoader(), new Class[]{field.getClass()}, new ProxyInvocationHandler());
+            } else {
+                subBeanInit = field.getType().newInstance();
+            }
+            beanInitMap.put(field.getType().getName(), subBeanInit);
+        } else {
+            subBeanInit = beanInitMap.get(field.getType().getName());
+        }
+        return subBeanInit;
     }
 
     /**
@@ -129,13 +165,19 @@ public class ApplicationContext {
      */
     public static void initBean() {
         Set<Class<?>> signClass = new HashSet<>();
-        //获取标记restController的类
+        //获取标记RestController的类
         Set<Class<?>> signRestControllerClass = SpringApplication.getReflectionUtils().getClassByAnnotation(RestController.class);
-        //获取标记service的类
+        //获取标记Service的类
         Set<Class<?>> signServiceClass = SpringApplication.getReflectionUtils().getClassByAnnotation(Service.class);
+        //获取标记RpcService的类
+        Set<Class<?>> signRpcServiceClass = SpringApplication.getReflectionUtils().getClassByAnnotation(RpcService.class);
 
         signClass.addAll(signRestControllerClass);
         signClass.addAll(signServiceClass);
+        signClass.addAll(signRpcServiceClass);
+
+        //获取接口的实现类 TODO 有可能会使其报错
+        rpcMap.putAll(signRpcServiceClass.stream().collect(Collectors.toMap(a -> a.getInterfaces()[0].getName(), Class::getName)));
 
         //将所有类注册进去bean管理器
         putBeanList(signClass);

@@ -1,5 +1,7 @@
 package com.rpc.application.netty;
 
+import com.rpc.application.netty.channel.HttpChannelInitializerImpl;
+import com.rpc.application.netty.channel.RpcServerChannelInitializerImpl;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,15 +15,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  * @author kiki
  * @date 2021/6/8
  */
-public class Server {
+public class Server implements Runnable {
 
     /**
      * 端口号
      */
-    private final static int PORT = 8080;
+    private int port;
 
 
-    public Server() {
+    public Server(int port) {
+        this.port = port;
     }
 
     /**
@@ -30,13 +33,13 @@ public class Server {
      * @author kiki
      * @since 2021/6/8 11:02 上午
      */
-    public static void run() {
+    @Override
+    public void run() {
         //负责接收请求的分组
-        EventLoopGroup acceptorGroup  = new NioEventLoopGroup(1);
+        EventLoopGroup acceptorGroup = new NioEventLoopGroup(1);
         //负责处理请求的分组
-        EventLoopGroup handleGroup = new NioEventLoopGroup();;
+        EventLoopGroup handleGroup = new NioEventLoopGroup();
         try {
-
             //创建一个server
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(acceptorGroup, handleGroup)
@@ -51,11 +54,12 @@ public class Server {
                     //设置配置  tcp握手时最大的消息队列大小
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     //初始化请求通道的处理流程
-                    .childHandler(new ChannelInitializerImpl());
-
-            System.out.println("初始化成功，开启服务中");
+                    .childHandler(new HttpChannelInitializerImpl())
+                    //初始化rpc请求通道的处理过程
+                    .childHandler(new RpcServerChannelInitializerImpl());
             //sync方法是等待异步操作执行完毕
-            ChannelFuture cf = bootstrap.bind(PORT).sync();
+            System.out.println("初始化成功，开启服务中");
+            ChannelFuture cf = bootstrap.bind(port).sync();
             //对通道关闭进行监听，closeFuture是异步操作，监听通道关闭
             //通过sync方法同步等待通道关闭处理完毕，这里会阻塞等待通道关闭完成
             cf.channel().closeFuture().sync();

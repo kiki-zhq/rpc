@@ -1,4 +1,4 @@
-package com.rpc.application.netty;
+package com.rpc.application.netty.handle;
 
 import com.alibaba.fastjson.JSON;
 import com.rpc.application.mvc.HandlerAdapter;
@@ -19,7 +19,7 @@ import java.net.SocketAddress;
  * @author kiki
  * @date 2021/6/8
  */
-public class ServerHandle extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpServerHandle extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 
     /**
@@ -44,7 +44,6 @@ public class ServerHandle extends SimpleChannelInboundHandler<FullHttpRequest> {
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-
         Object result = HandlerAdapter.handle(msg.content().toString(CharsetUtil.UTF_8), getUrl(ctx, msg), msg.method().name());
         responseResult(ctx, result);
     }
